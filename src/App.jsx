@@ -14,6 +14,10 @@ import Register from './components/auth/Register'
 import Checkout from './components/checkout/Checkout'
 import PaymentConfirmation from './components/checkout/PaymentConfirmation'
 import AdminPage from './components/admin/Admin'
+import ChangePassword from './components/profile/ChangePassword'; // Import component đổi mật khẩu
+import OrderHistory from './components/profile/OrderHistory'; // Import component lịch sử đơn hàng
+import Footer from './components/shared/Footer'
+import Chatbot from './components/Chatbot'
 function App() {
   return (
     <React.Fragment>
@@ -29,15 +33,23 @@ function App() {
           <Route path='/' element={<PrivateRoute />}>
             <Route path='/checkout' element={<Checkout />} />
             <Route path='/order-confirm' element={<PaymentConfirmation />} />
+            <Route path='/profile/order-history' element={<OrderHistory />} /> {/* Thêm route này */}
+            <Route path='/change-password' element={<ChangePassword />} /> Thêm route này
           </Route>
 
           <Route path='/' element={<PrivateRoute publicPage />}>
             <Route path='/login' element={<LogIn />} />
             <Route path='/register' element={<Register />} />
           </Route>
+          <Route path="/chatbot" element={<Chatbot />} /> {/* Thêm route này */}
+
           <Route path='/admin' element={<AdminPage />} />
         </Routes>
+        <Footer />
+        {/* <BackDrop /> */}
       </Router>
+      {/* <Chatbot /> */}
+      {/* <BackDrop /> */}
       <Toaster position='bottom-center' />
     </React.Fragment>
   )

@@ -166,8 +166,14 @@ export const addUpdateUserAddress =
               headers: { Authorization: "Bearer " + user.jwtToken },
             });
         */
+
         dispatch({ type: "BUTTON_LOADER" });
         try {
+            // const { user } = getState().auth;
+            // await api.post(`/addresses`, sendData, {
+            //     headers: { Authorization: "Bearer " + user.jwtToken },
+            // });
+
             if (!addressId) {
                 const { data } = await api.post("/addresses", sendData);
             } else {
@@ -248,7 +254,11 @@ export const addPaymentMethod = (method) => {
 export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
     try {
         dispatch({ type: "IS_FETCHING" });
-        await api.post('/cart/create', sendCartItems);
+
+        for (const item of sendCartItems) {
+            await api.post(`/carts/products/${item.productId}/quantity/${item.quantity}`);
+        }
+
         await dispatch(getUserCart());
     } catch (error) {
         console.log(error);
@@ -258,6 +268,7 @@ export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
         });
     }
 };
+
 
 
 export const getUserCart = () => async (dispatch, getState) => {
@@ -305,6 +316,42 @@ export const stripePaymentConfirmation
     = (sendData, setErrorMesssage, setLoadng, toast) => async (dispatch, getState) => {
         try {
             const response = await api.post("/order/users/payments/online", sendData);
+            if (response.data) {
+                localStorage.removeItem("CHECKOUT_ADDRESS");
+                localStorage.removeItem("cartItems");
+                localStorage.removeItem("client-secret");
+                dispatch({ type: "REMOVE_CLIENT_SECRET_ADDRESS" });
+                dispatch({ type: "CLEAR_CART" });
+                toast.success("Order Accepted");
+            } else {
+                setErrorMesssage("Payment Failed. Please try again.");
+            }
+        } catch (error) {
+            setErrorMesssage("Payment Failed. Please try again.");
+        }
+    };
+export const createCODPaymentSecret
+    = (totalPrice) => async (dispatch, getState) => {
+        try {
+            dispatch({ type: "IS_FETCHING" });
+            const { data } = await api.post("/order/COD", {
+                "amount": Number(totalPrice) * 1000,
+                "currency": "VND"
+            });
+            dispatch({ type: "CLIENT_SECRET", payload: data });
+            localStorage.setItem("client-secret", JSON.stringify(data));
+            dispatch({ type: "IS_SUCCESS" });
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || "Failed to create client secret");
+        }
+    };
+
+
+export const codPaymentConfirmation
+    = (sendData, setErrorMesssage, setLoadng, toast) => async (dispatch, getState) => {
+        try {
+            const response = await api.post("/order/users/payments/cod", sendData);
             if (response.data) {
                 localStorage.removeItem("CHECKOUT_ADDRESS");
                 localStorage.removeItem("cartItems");
