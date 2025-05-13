@@ -10,7 +10,7 @@ import { formatPrice } from "../../utils/formatPrice"; // Import hàm formatPric
 const ProductCard = ({
     productId,
     productName,
-    image,
+    thumbnailUrl,
     description,
     quantity,
     price,
@@ -34,6 +34,7 @@ const ProductCard = ({
     const addToCartHandler = (cartItems) => {
         dispatch(addToCart(cartItems, 1, toast));
     };
+    const validImage = thumbnailUrl && !thumbnailUrl.includes("null") ? thumbnailUrl : "https://via.placeholder.com/150";
 
     return (
         <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300">
@@ -52,7 +53,7 @@ const ProductCard = ({
                 className="w-full overflow-hidden aspect-[3/2]">
                 <img
                     className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105"
-                    src={image}
+                    src={validImage}
                     alt={productName}>
                 </img>
             </div>
@@ -61,7 +62,7 @@ const ProductCard = ({
                     handleProductView({
                         id: productId,
                         productName,
-                        image,
+                        thumbnailUrl,
                         description,
                         quantity,
                         price,
@@ -100,7 +101,7 @@ const ProductCard = ({
                         <button
                             disabled={!isAvailable || btnLoader}
                             onClick={() => addToCartHandler({
-                                image,
+                                thumbnailUrl,
                                 productName,
                                 description,
                                 specialPrice,
